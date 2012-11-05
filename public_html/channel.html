@@ -1,0 +1,139 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<script src="jquery-1.7.2.min.js"></script>
+<script>
+<!--
+$(function(){
+	$(document).ready(function() {
+	
+	var overlay = $('<div>').addClass('overlay');
+	$(document.body).append(overlay);
+	overlay.append($("#front-panel"));
+	overlay.hide();
+	overlay.bind('click',function(){
+		overlay.hide("slow");
+	});
+
+
+	//var url = "http://gdata.youtube.com/feeds/api/users/yahoo/uploads";
+	var url = "http://gdata.youtube.com/feeds/api/users/google/uploads";
+	$.getJSON(url, { alt:'json' }, function(json) {
+		//èàóùÇèëÇ≠
+		console.log(json);
+		var i,img;
+		for(i = 0; i < json.feed.entry.length; i++){
+			img = json.feed.entry[i]['media$group']['media$thumbnail'][0].url;
+			
+			// àÍóóâÊëúÇí«â¡
+
+			$('<img>').attr('src', img)
+				.attr('width','200px')
+				.attr('height','auto')
+				.bind('click',function(n){
+					return function(){
+						ggetComments($('#comments-body'),json.feed.entry[n]['link'][0].href.replace(/&feature=.*/,""));
+						overlay.show("slow");
+						$('body,html').animate({
+							scrollTop: 0
+						}, 500);
+						
+						console.log(json.feed.entry[n]['link'][0].href.replace(/&feature=.*/,""))
+						$('#front-image').empty();
+						$('#front-image').append($('<div>').append(
+							$('<div>').addClass('imgwrap').append(
+							$('<img>')
+							.attr('src',json.feed.entry[n]['media$group']['media$thumbnail'][0].url)
+							.css('width','100%')
+							.css('height','100%')
+							))
+							.css('width','100%')
+							.css('height','100%'));
+						
+					}
+				}(i))
+				.appendTo($('#contents'))
+				;
+		}
+	});
+	});
+});
+
+
+// Comments
+var ggetComments = null;
+$(function(){
+	function getComments(elm,url){
+		function getFacebookComments(id){
+			$.getJSON(
+			"https://graph.facebook.com/?ids=" + id,
+			function(o){
+				var fid = o[id].id;
+				$.getJSON(
+				"https://graph.facebook.com/comments/?ids=" + fid,
+				function(o2){
+					var comments = o2[fid].comments.data;
+					for(var i=0;i<comments.length;i++){
+						$('<div>')
+							.append($('<img>').attr('src','https://graph.facebook.com/' + comments[i].from.id + '/picture'))
+							.append($('<div>').text(comments[i].message)).appendTo(elm);
+					}
+				}
+				);
+			}
+			);
+		}
+		function getTwitterComments(key){
+		 	$.getJSON(
+			"http://search.twitter.com/search.json?q="+encodeURIComponent(key)+"&rpp=10&callback=?",
+			function(o){
+				console.log(o);
+				for(var i = 0; i < o.results.length; i++){
+						$('<div>')
+							.append($('<img>').attr('src',o.results[i].profile_image_url))
+							.append($('<div>').text(o.results[i].text)).appendTo(elm);
+				}
+			}
+			);
+		}
+		//$('#header').append($('<h1>').text(url));
+		getFacebookComments(url);
+		getTwitterComments(url);
+	}
+	ggetComments = function(elm, url){
+		elm.empty();
+		getComments(elm,url);
+		
+	}
+});
+
+
+
+-->
+</script>
+<link rel="STYLESHEET" href="channel.css" type="text/css"></link>
+</head>
+<body>
+<div id="front-panel" class="">
+	<div class="w100 clearfix">
+		<div id="front-image" class="lfloat">image</div>
+		<div class="" id="comments">
+			<div class="pad" id="comments-body">
+			</div>
+		</div>
+		</div>
+	</div>
+</div>
+
+<div id="header">
+<h1>Title</h1>
+</div>
+<div id="contents">
+</div>
+<div id="footer">
+footer
+</div>
+
+
+</body>
+</html>
